@@ -1,0 +1,12 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager MyNavigationManager
+<h1>@title</h1>
+@Body
+@code{
+    public string title;
+ protected override void OnInitialized(){
+    title = MyNavigationManager.Uri;
+    int startPos = MyNavigationManager.BaseUri.Length;
+    title = title.Substring(startPos);
+ }
+}

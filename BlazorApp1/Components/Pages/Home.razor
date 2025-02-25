@@ -1,0 +1,68 @@
+﻿@page "/{tableNum:int?}"
+@rendermode InteractiveServer
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+<p role="status">@dateDisplay</p>
+<p></p>
+Welcome to your new app.
+@if(alphabetOn){
+<ol>
+@for(int i = 0; i < numLetters ; i++){
+    <li>@letters[i]</li>
+}
+</ol>
+}
+<button @onclick = "getDate">Date</button>
+<button @onclick = "Alphabet">Alphabet</button>
+
+<Counter IncrementAmount="randomAmount()"/>
+@if (randomNumbers!= null){
+<table class="table table-striped">
+        <thead>
+            <tr>
+                <th>RandomNumber</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(int randomNumber in randomNumbers){
+                <tr>
+                    <td>@randomNumber</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    }
+@code{
+    bool alphabetOn = false;
+    string dateDisplay = "Who Cares?";
+    string[] letters = {"a","b","c","d","e","f","g","h","i","j","k", "l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
+    int numLetters = 0;
+    int[]? randomNumbers;
+    [Parameter]
+    public int? tableNum {get; set;}
+     
+    int randomAmount(){
+        return Random.Shared.Next(2,10);
+    }
+    void getDate(){
+        
+       dateDisplay = DateTime.Today.ToShortDateString();
+    }
+    void Alphabet(){
+        numLetters = Random.Shared.Next(1,27);
+       alphabetOn = !alphabetOn;
+        
+    }
+    protected override void OnInitialized(){
+        if(tableNum == null){
+        randomNumbers = new int[Random.Shared.Next(1,10)];
+        }else{
+            randomNumbers = new int[(int)tableNum];
+        }
+        for(int i = 0; i < randomNumbers.Length; i++){
+            randomNumbers[i] = Random.Shared.Next(0,51);
+        }
+    }
+    
+}
