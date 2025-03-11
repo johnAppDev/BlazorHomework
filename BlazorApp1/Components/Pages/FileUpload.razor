@@ -1,0 +1,120 @@
+@page "/fileupload"
+@rendermode InteractiveServer
+<InputFile OnChange ="FileUploaded"/>
+<h2>Selected file</h2>
+<div>
+    <div>File name: @FileName</div>
+    <div>File size: @FileSize.ToString("n0") bytes</div>
+    <div>File type: @FileType</div>
+    <div>Last modified: @LastModified</div>
+</div>
+
+    <button @onclick = "csvReader">Read CSV</button>
+    <p> @readerEvents.Count</p>
+    <p>@hopefullyNotAnException</p>
+ <table>
+        <tr>
+            <th>Key</th>
+            <th>Name</th>
+            <th>NumEvents</th>
+        </tr>
+            @foreach(KeyValuePair<string, List<ReaderEvent>> readerEvent in readerDictionary){
+   
+                <tr>
+                    <td>@readerEvent.Key</td>
+                    <td>@readerEvent.Value[0].readerDescription</td>
+                    <td>@readerEvent.Value.Count</td>
+                </tr>
+            }
+  </table>
+
+@code{
+    
+     public string FileName { get; set; } = "";
+    public long FileSize { get; set; }
+    public string FileType { get; set; } = "";
+    public DateTimeOffset LastModified { get; set; }
+    public string ErrorMessage { get; set; } = "";
+    public List<ReaderEvent> readerEvents = new List<ReaderEvent>();
+    public Dictionary<string, List<ReaderEvent>> readerDictionary = new Dictionary<string, List<ReaderEvent>>();
+        public string hopefullyNotAnException = "";
+
+    const int MAX_FILESIZE = 5000 * 1024;
+   // string targetFilePath = "/Users/coltenroberts/Desktop/Developer Folder/Blazor/BlazorApp1/wwwroot/FileDownload";
+   
+    public async Task FileUploaded(InputFileChangeEventArgs e){
+        
+        var browserFile = e.File;
+        if(browserFile != null){
+            Console.WriteLine("File is not null");
+             FileSize = browserFile.Size;
+            FileType = browserFile.ContentType;
+            FileName = browserFile.Name;
+            LastModified = browserFile.LastModified;
+            
+
+            try{
+                
+                 var fileStream = browserFile.OpenReadStream(MAX_FILESIZE);
+                 var destinationStream = new FileStream(FileName, FileMode.Create);
+                await fileStream.CopyToAsync(destinationStream);
+                destinationStream.Close();
+            }catch(Exception exception){
+                Console.WriteLine(exception);
+            }
+        }
+    }
+    public Dictionary<string, List<ReaderEvent>> populateDictionary(List<ReaderEvent> readerList){
+            Dictionary<string, List<ReaderEvent>> eventDictionary = new Dictionary<string,List<ReaderEvent>>();
+            foreach(ReaderEvent readerEvent in readerList){
+                if (!eventDictionary.ContainsKey(readerEvent.devid + readerEvent.machine)){
+                    List<ReaderEvent> events = new List<ReaderEvent>();
+                    events.Add(readerEvent);
+                    eventDictionary.Add(readerEvent.devid +readerEvent.machine, events);
+                }else{
+                    eventDictionary[readerEvent.devid + readerEvent.machine].Add(readerEvent);
+                }
+            }
+            return eventDictionary;
+        }
+    public void  csvReader(){
+            try
+            {
+                StreamReader sr = new StreamReader(FileName);
+                sr.ReadLine();
+                string? line = sr.ReadLine();
+               // List<String> words = new List<string>();
+                
+                while (line != null)
+                {
+                    string[] words = line.Split(",");
+                    ReaderEvent tempEvent = new ReaderEvent(words[0], words[1], words[2], words[3], words[4], words[5]);
+                    readerEvents.Add(tempEvent);
+                    line = sr.ReadLine();
+                }
+                
+               readerDictionary = populateDictionary(readerEvents);
+            }catch(Exception exception){
+                hopefullyNotAnException = exception.Message;
+                Console.WriteLine(exception);
+            }
+           
+            
+    }
+    public class ReaderEvent{
+        public ReaderEvent(string time, string location, string readerDescription, string idhash, string devid, string machine){
+            this.time = time;
+            this.location = location;
+            this.readerDescription = readerDescription;
+            this.idhash = idhash;
+            this.devid = devid;
+            this.machine = machine;
+        }
+        public string time;
+        public string location;
+        public string readerDescription;
+        public string idhash;
+        public string devid;
+        public string machine;
+    }
+}

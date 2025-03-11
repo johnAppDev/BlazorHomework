@@ -1,0 +1,42 @@
+@page "/breakfast"
+@rendermode InteractiveServer 
+@attribute [StreamRendering]
+<div>
+<button @onclick ="pourCoffee">Pour Coffee</button>
+<p>@coffeeLabel</p>
+</div>
+<div>
+<button @onclick ="FryEggsAsync">Fry eggs</button>
+<p>@eggStatus</p>
+</div>
+
+
+@code{
+string coffeeLabel = "";
+string eggStatus = "";
+
+    void pourCoffee(MouseEventArgs e){
+        coffeeLabel = "Coffee Ready " + DateTime.Now.ToLongTimeString();
+    }
+    private void FryEggs(){
+        eggStatus = "";
+        eggStatus = "cooking the eggs ...";
+        Task.Delay(3000).Wait();
+        eggStatus = "cooking the eggs ...";
+        Task.Delay(3000).Wait();
+        eggStatus = "Put eggs on plate";
+
+    }
+    private async Task FryEggsAsync()
+        {
+            eggStatus = "Warming the egg pan...";
+            await Task.Delay(3000);
+            eggStatus = "cooking the eggs ...";
+            this.StateHasChanged();
+            await Task.Delay(3000);
+            eggStatus = "Put eggs on plate";
+            
+        }
+
+
+}

@@ -1,0 +1,38 @@
+@page "/BMI"
+@rendermode InteractiveServer
+<div class="form-group">
+    <label for="weight" style="font-family: 'Comic Sans MS', cursive;">Weight</label>
+    <input type="text" class="form-control" @onchange = "setWeight" id="weight">
+</div>
+<div class="form-group" style="border-style: dotted; margin-top: 10px;">
+    <p style="font-family: 'Comic Sans MS', cursive;"> Height</p>
+    <label for="weight" style="font-family: 'Comic Sans MS', cursive;">Feet </label>
+    <input type="text" class="form-control" @onchange = "setFeet" id="weight">
+    
+    <label for="weight" style="font-family: 'Comic Sans MS', cursive;">Inches</label>
+    <input type="text" class="form-control" @onchange = "setInches" id="weight">
+</div>
+<p>BMI: @bodyMassIndex</p>
+
+@code{
+    int feet = 0;
+    int inches = 0;
+    int weight = 0;
+    float bodyMassIndex = 0;
+
+    void setWeight(ChangeEventArgs e){
+        weight = Int32.Parse((string)e.Value!);
+        calculateBMI();
+    }
+    void setFeet(ChangeEventArgs e){
+        feet =  Int32.Parse((string)e.Value!);
+        calculateBMI();
+    }
+    void setInches(ChangeEventArgs e){
+         inches = Int32.Parse((string)e.Value!);
+         calculateBMI();
+    }
+    void calculateBMI(){
+        bodyMassIndex =weight/MathF.Pow(inches + feet*12, 2) * 703;
+    }
+}

@@ -1,0 +1,48 @@
+@page "/dogs"
+@rendermode InteractiveServer
+
+<h1>Dogs to walk</h1>
+<div>
+    <input @bind = "dogName">
+    <button @onclick = "addDog">Add</button>
+   
+</div>
+<h2>The Dogs' combined age is @getCombinedAge()</h2>
+<ul>
+    @foreach(Dog dog in dogs){
+        <li>
+             <button @onclick = "() => removeDog(dog)">Remove Dog</button>
+            <input @bind = "dog.name">
+            <input @bind = "dog.age">
+        </li>
+    }
+</ul>
+
+@code{
+    string dogName = "";
+    List<Dog> dogs = new List<Dog>();
+    public class Dog
+    {
+        public string name {get; set;}
+        public int age {get; set;}
+    }
+    void addDog(MouseEventArgs e){
+        if(!string.IsNullOrWhiteSpace(dogName)){
+              Dog temp = new Dog();
+             temp.name = dogName;
+
+            dogs.Add(temp);
+        }
+      
+    }
+    void removeDog( Dog dog){
+        dogs.Remove(dog);
+    }
+    int getCombinedAge(){
+        int age = 0;
+        foreach(Dog dog in dogs){
+            age += dog.age;
+        }
+        return age;
+    }
+}    

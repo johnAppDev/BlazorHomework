@@ -13,13 +13,21 @@ Welcome to your new app.
 }
 </ol>
 }
-<button @onclick = "getDate">Date</button>
+<button @onclick = "() => dateDisplay = DateTime.Today.ToShortDateString()">Date</button>
 <button @onclick = "Alphabet">Alphabet</button>
-
+<div>
+    <input @onchange = "userNameChanged ">
+</div>
+<p>Name: @userName</p>
+<div>
+    <input @oninput = "addressChanged ">
+</div>
+<p>Address: @address</p>
+<div style="background-color: @colors[colorIndex];" @onmouseover = "changeColor" @onmouseout = "selectRandomColor">HoverOver</div>
 <Counter IncrementAmount="randomAmount()"/>
 @if (randomNumbers!= null){
 <table class="table table-striped">
-        <thead>
+        <thead style="background-color:">
             <tr>
                 <th>RandomNumber</th>
             </tr>
@@ -34,6 +42,10 @@ Welcome to your new app.
     </table>
     }
 @code{
+    string[] colors = {"red", "blue","green","chartreuse","purple"};
+    int colorIndex = 0;
+    string userName = "";
+    string address = "";
     bool alphabetOn = false;
     string dateDisplay = "Who Cares?";
     string[] letters = {"a","b","c","d","e","f","g","h","i","j","k", "l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
@@ -45,16 +57,13 @@ Welcome to your new app.
     int randomAmount(){
         return Random.Shared.Next(2,10);
     }
-    void getDate(){
-        
-       dateDisplay = DateTime.Today.ToShortDateString();
-    }
     void Alphabet(){
         numLetters = Random.Shared.Next(1,27);
        alphabetOn = !alphabetOn;
         
     }
     protected override void OnInitialized(){
+        colorIndex = 0;
         if(tableNum == null){
         randomNumbers = new int[Random.Shared.Next(1,10)];
         }else{
@@ -63,6 +72,22 @@ Welcome to your new app.
         for(int i = 0; i < randomNumbers.Length; i++){
             randomNumbers[i] = Random.Shared.Next(0,51);
         }
+    }
+    void userNameChanged(ChangeEventArgs e){
+        userName = (string)e.Value!;
+    }
+    void addressChanged(ChangeEventArgs e){
+        address = (string)e.Value!;
+    }
+     void changeColor(MouseEventArgs e){
+        if(colorIndex < colors.Length-1){
+            colorIndex++;
+        }else{
+            colorIndex = 0;
+        }
+    }
+    void selectRandomColor(MouseEventArgs e){
+        colorIndex = Random.Shared.Next(0, colors.Length);
     }
     
 }
